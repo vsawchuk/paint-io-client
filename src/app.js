@@ -1,11 +1,13 @@
+/*jshint esversion: 6 */
 import Button from './Button';
 import ColorSelector from './ColorSelector';
 import PaintCanvas from './PaintCanvas';
 import Message from './Message';
 import Panel from './Panel';
 import './app.css';
-// TODO 1.1: import socket.io-client
-// TODO 1.2: create a new socket connection by invoking "socket.io-client". Convention is to name the returned socket instance "socket".
+// 1.1: import socket.io-client
+// 1.2: create a new socket connection by invoking "socket.io-client". Convention is to name the returned socket instance "socket".
+const socket = require('socket.io-client')();
 
 /**
  * Creates a layout panel in a specified position. Other components can use
@@ -41,11 +43,15 @@ let username; // client username
 const paintCanvas = new PaintCanvas({
   mountPoint: document.body,
   onMove({points, color}) {
-    // TODO 1.3: emit a "DRAW_POINTS" message to the server when paintCanvas has mouseMove events
+    // 1.3: emit a "DRAW_POINTS" message to the server when paintCanvas has mouseMove events
+    socket.emit('DRAW_POINTS', {points, color});
   },
 });
 
-// TODO 1.4: listen for draw events from the server of the draw action-type (eg "DRAW_POINTS") and use the paintCanvas.drawLine(Array<{x: number, y: number}>, color: string) method to draw the points on the canvas.
+// 1.4: listen for draw events from the server of the draw action-type (eg "DRAW_POINTS") and use the paintCanvas.drawLine(Array<{x: number, y: number}>, color: string) method to draw the points on the canvas.
+socket.on('DRAW_POINTS', ({points, color}) => {
+  paintCanvas.drawLine(points, color);
+});
 
 // create and render the color selector
 new ColorSelector({
